@@ -1,0 +1,4 @@
+click==7.1.2
+colorama==0.4.4
+shellingham==1.4.0
+typer==0.3.2
