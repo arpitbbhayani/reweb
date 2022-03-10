@@ -3,8 +3,6 @@
     <head lang="en">
         <link rel="stylesheet" media="print" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
         <title>{{ site.title }}</title>
-        <base href="{{ site.baseurl }}" target="_blank" />
-
         <meta charset="UTF-8">
         <meta name="description" content="{{ site.description }}">
         <meta name="keywords" content="{{ site.keywords|join(', ') }}">
@@ -14,6 +12,7 @@
     <body>
         <div class="title is-size-1">
             <h1>{{ site.name }}</h1>
+            {{ content }}
         </div>
     </body>
 </html>

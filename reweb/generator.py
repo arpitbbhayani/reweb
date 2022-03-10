@@ -29,6 +29,19 @@ def __generate_page_md(md_filepath, site):
         fp.write(output)
 
 
+def __generate_page_html(html_filepath, site):
+    with open(html_filepath, "r") as fp:
+        content = fp.read()
+
+    distpath = __generate_distpath(html_filepath)
+
+    output = render("layout.jinja3.html", site=site, content=content)
+
+    # create the file
+    with open(distpath, "w") as fp:
+        fp.write(output)
+
+
 def __generate_pages(site):
     basepath = "./pages"
     for (root, _, filepaths) in os.walk(basepath):
@@ -36,6 +49,8 @@ def __generate_pages(site):
             filepath = os.path.join(root, path)
             if path.endswith(".md"):
                 __generate_page_md(filepath, site)
+            elif path.endswith(".html"):
+                __generate_page_html(filepath, site)
             else:
                 raise Exception("unsupported page: " + path)
 
