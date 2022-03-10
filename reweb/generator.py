@@ -1,7 +1,5 @@
 import os
-import tarfile
-
-import semver
+import shutil
 
 from reweb.templates import render
 from reweb.site import read_site, store_site
@@ -66,6 +64,4 @@ def generate():
     site.version = next_version(site)
     store_site(site)
 
-    # tar = tarfile.open(".gz", "w:gz")
-    # tar.add("folder/location", arcname="TarName")
-    # tar.close()
+    shutil.make_archive(f"{site.name}-{site.version}", 'zip', "dist")
