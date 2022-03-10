@@ -1,7 +1,8 @@
-from reweb import cli, __app_name__
+from reweb import cli
+
 
 def main():
-    cli.app(prog_name=__app_name__)
+    cli.app(prog_name="reweb")
 
 
 if __name__ == "__main__":

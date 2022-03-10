@@ -1,0 +1,7 @@
+{
+    "name": "{{ site.name }}",
+    "description": "{{ site.description }}",
+    "baseurl": "{{ site.baseurl }}",
+    "keywords": [],
+    "author": "{{ site.author }}"
+}

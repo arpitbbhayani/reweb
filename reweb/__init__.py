@@ -1,6 +1,3 @@
-__app_name__ = "reweb"
-__version__ = "0.1.0"
-
 (
     SUCCESS,
     DIR_ERROR,
@@ -18,3 +15,7 @@ ERRORS = {
     DB_WRITE_ERROR: "database write error",
     ID_ERROR: "to-do id error",
 }
+
+from .generator import generate
+from .version import version
+from .init import init
