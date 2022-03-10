@@ -1,4 +1,5 @@
 {
+    "version": "0.1",
     "name": "{{ site.name }}",
     "description": "{{ site.description }}",
     "baseurl": "{{ site.baseurl }}",

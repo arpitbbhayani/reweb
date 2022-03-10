@@ -17,5 +17,4 @@ ERRORS = {
 }
 
 from .generator import generate
-from .version import version
 from .init import init

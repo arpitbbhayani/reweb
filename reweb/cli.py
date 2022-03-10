@@ -1,10 +1,11 @@
 import typer
 import reweb
+from reweb.site import read_site
 
 app = typer.Typer()
 
-@app.command("run")
-def run():
+@app.command("build")
+def build():
     reweb.generate()
 
 
@@ -15,4 +16,5 @@ def init():
 
 @app.command("version")
 def version():
-    print(reweb.version)
+    site = read_site()
+    print(site.version)

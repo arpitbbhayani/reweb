@@ -1,7 +1,11 @@
 import os
+import tarfile
+
+import semver
 
 from reweb.templates import render
-from reweb.site import read_site
+from reweb.site import read_site, store_site
+from reweb.version import next_version
 
 
 def __generate_distpath(filepath):
@@ -58,3 +62,10 @@ def generate():
     site = read_site()
     __setup_dist()
     __generate_pages(site)
+    
+    site.version = next_version(site)
+    store_site(site)
+
+    # tar = tarfile.open(".gz", "w:gz")
+    # tar.add("folder/location", arcname="TarName")
+    # tar.close()

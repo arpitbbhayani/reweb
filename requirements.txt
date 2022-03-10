@@ -6,6 +6,7 @@ Markdown==3.3.6
 MarkupSafe==2.1.0
 python-frontmatter==1.0.0
 PyYAML==6.0
+semver==2.13.0
 shellingham==1.4.0
 typer==0.3.2
 zipp==3.7.0
