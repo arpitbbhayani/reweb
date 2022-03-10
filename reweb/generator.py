@@ -1,6 +1,7 @@
 import os
 
 from reweb.templates import render
+from reweb.site import read_site
 
 
 def __generate_distpath(filepath):
@@ -18,26 +19,27 @@ def __setup_dist():
         os.mkdir("dist")
 
 
-def __generate_page_md(md_filepath):
+def __generate_page_md(md_filepath, site):
     distpath = __generate_distpath(md_filepath)
 
-    output = render("layout.jinja3.html")
+    output = render("layout.jinja3.html", site=site)
 
     # create the file
     with open(distpath, "w") as fp:
         fp.write(output)
 
 
-def __generate_pages():
+def __generate_pages(site):
     basepath = "./pages"
     for (root, _, filepaths) in os.walk(basepath):
         for path in filepaths:
             filepath = os.path.join(root, path)
             if path.endswith(".md"):
-                __generate_page_md(filepath)
+                __generate_page_md(filepath, site)
             else:
                 raise Exception("unsupported page: " + path)
 
 def generate():
+    site = read_site()
     __setup_dist()
-    __generate_pages()
+    __generate_pages(site)
