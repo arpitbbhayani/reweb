@@ -15,7 +15,7 @@ def init():
         author = typer.prompt("Name of the author?")
         keywords = []
 
-        config = render(
+        content = render(
             "config.jinja3.json",
             site=Site(
                 name=name,
@@ -28,7 +28,7 @@ def init():
         )
 
         with open("reweb.json", "w") as fp:
-            fp.write(config)
+            fp.write(content)
 
     if not os.path.exists("assets"):
         os.mkdir("assets")
@@ -37,14 +37,19 @@ def init():
         os.mkdir("assets/css")
 
     if not os.path.exists("assets/css/style.scss"):
-        css = render("style.jinja3.scss")
+        content = render("style.jinja3.scss")
         with open("assets/css/style.scss", "w") as fp:
-            fp.write(css)
+            fp.write(content)
 
     if not os.path.exists("pages"):
         os.mkdir("pages")
 
     if not os.path.exists("pages/index.html"):
-        html = render("index.jinja3.html")
+        content = render("index.jinja3.html")
         with open("pages/index.html", "w") as fp:
-            fp.write(html)
+            fp.write(content)
+
+    if not os.path.exists(".gitignore"):
+        content = render("gitignore.jinja3.html")
+        with open(".gitignore", "w") as fp:
+            fp.write(content)
