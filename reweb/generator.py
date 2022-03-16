@@ -3,6 +3,7 @@ import shutil
 import tempfile
 
 import sass
+import requests, zipfile
 
 from reweb.templates import render
 from reweb.site import read_site, store_site
@@ -11,18 +12,26 @@ from reweb.version import next_version
 
 def __generate_css(site):
     with tempfile.TemporaryDirectory() as tempdir:
-        tempdir = "/tmp"
-        path_bulma = os.path.join(tempdir, "bulma.sass")
-        with open(path_bulma, "w") as fp:
-            fp.write(render("bulma.sass"))
-        with open("final.css", "w") as fp:
-            css_template = render("custom.jinja3.scss", path_bulma=path_bulma)
-            fp.write(css_template)
-            print(css_template)
-            with open("final.css", "r") as fp1:
-                content = fp1.read()
-                print(content)
-                print(sass.compile(string=content))
+        tempdir = "/tmp/test"
+        resp = requests.get("https://github.com/jgthms/bulma/releases/download/0.9.3/bulma-0.9.3.zip")
+        print(tempdir)
+        with open(os.path.join(tempdir, "bulma.zip"), "wb") as fp:
+            fp.write(resp.content)
+
+        zf = zipfile.ZipFile(os.path.join(tempdir, "bulma.zip"))
+        zf.extractall(tempdir)
+
+        if not os.path.exists("dist/static/"):
+            os.mkdir("dist/static/")
+        
+        with open("assets/style.scss") as fp:
+            user_style = fp.read()
+
+        with open(os.path.join(tempdir, "custom.scss"), "w") as fp:
+            fp.write(render("bulma.jinja3.scss", user_style=user_style))
+
+        with open("dist/static/style.css", "w") as fp:
+            fp.write(sass.compile(filename=f'{tempdir}/custom.scss'))
 
 
 def __generate_bundle(site):

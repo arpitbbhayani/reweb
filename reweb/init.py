@@ -33,12 +33,9 @@ def init():
     if not os.path.exists("assets"):
         os.mkdir("assets")
 
-    if not os.path.exists("assets/css"):
-        os.mkdir("assets/css")
-
-    if not os.path.exists("assets/css/style.scss"):
+    if not os.path.exists("assets/style.scss"):
         content = render("style.jinja3.scss")
-        with open("assets/css/style.scss", "w") as fp:
+        with open("assets/style.scss", "w") as fp:
             fp.write(content)
 
     if not os.path.exists("pages"):
