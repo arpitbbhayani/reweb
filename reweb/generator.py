@@ -1,9 +1,35 @@
 import os
 import shutil
+import tempfile
+
+import sass
 
 from reweb.templates import render
 from reweb.site import read_site, store_site
 from reweb.version import next_version
+
+
+def __generate_css(site):
+    with tempfile.TemporaryDirectory() as tempdir:
+        tempdir = "/tmp"
+        path_bulma = os.path.join(tempdir, "bulma.sass")
+        with open(path_bulma, "w") as fp:
+            fp.write(render("bulma.sass"))
+        with open("final.css", "w") as fp:
+            css_template = render("custom.jinja3.scss", path_bulma=path_bulma)
+            fp.write(css_template)
+            print(css_template)
+            with open("final.css", "r") as fp1:
+                content = fp1.read()
+                print(content)
+                print(sass.compile(string=content))
+
+
+def __generate_bundle(site):
+    site.version = next_version(site)
+    store_site(site)
+
+    shutil.make_archive(f"{site.name}-{site.version}", 'zip', "dist")
 
 
 def __generate_distpath(filepath):
@@ -59,9 +85,6 @@ def __generate_pages(site):
 def generate():
     site = read_site()
     __setup_dist()
+    __generate_css(site)
     __generate_pages(site)
-    
-    site.version = next_version(site)
-    store_site(site)
-
-    shutil.make_archive(f"{site.name}-{site.version}", 'zip', "dist")
+    __generate_bundle(site)
