@@ -1,11 +1,14 @@
 import os
-import shutil
 import tempfile
+from hashlib import md5
 
 import sass
+import frontmatter
+import markdown
+from markdown.extensions import fenced_code
 import requests, zipfile
 
-from reweb.templates import render
+from reweb.templates import render, render_by_name
 from reweb.site import read_site, store_site
 from reweb.version import next_version
 
@@ -28,7 +31,7 @@ def __generate_css(site):
             user_style = fp.read()
 
         with open(os.path.join(tempdir, "custom.scss"), "w") as fp:
-            fp.write(render("bulma.jinja3.scss", user_style=user_style))
+            fp.write(render_by_name("bulma.jinja3.scss", user_style=user_style))
 
         with open("dist/static/style.css", "w") as fp:
             fp.write(sass.compile(filename=f'{tempdir}/custom.scss'))
@@ -38,7 +41,8 @@ def __generate_bundle(site):
     site.version = next_version(site)
     store_site(site)
 
-    shutil.make_archive(f"{site.name}-{site.version}", 'zip', "dist")
+    # TODO: ZIP
+    # shutil.make_archive(f"{site.name}-{site.version}", 'zip', "dist")
 
 
 def __generate_distpath(filepath):
@@ -57,9 +61,12 @@ def __setup_dist():
 
 
 def __generate_page_md(md_filepath, site):
+    page = frontmatter.load(md_filepath)
+    content = markdown.markdown(page.content, extensions=[fenced_code.FencedCodeExtension()])
+
     distpath = __generate_distpath(md_filepath)
 
-    output = render("layout.jinja3.html", site=site)
+    output = render(site=site, content=content, type="md", page=page.to_dict())
 
     # create the file
     with open(distpath, "w") as fp:
@@ -72,7 +79,7 @@ def __generate_page_html(html_filepath, site):
 
     distpath = __generate_distpath(html_filepath)
 
-    output = render("layout.jinja3.html", site=site, content=content)
+    output = render(site=site, content=content)
 
     # create the file
     with open(distpath, "w") as fp:
