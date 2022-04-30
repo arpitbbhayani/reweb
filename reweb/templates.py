@@ -21,17 +21,16 @@ with tempfile.TemporaryDirectory() as tempdir:
     )
 
 
-def render(site, content, type="html", page=None):
+def render(site, content, type="html", template="blog.html", page=None):
     name = uuid4().hex
     tpath = os.path.join(tempdir, name)
 
     if type == "md":
-        content = jenv.get_template("blog.html").render(content=content, page=page, site=site)
+        content = jenv.get_template(template).render(content=content, page=page, site=site)
 
     with open(tpath, "w") as fp:
         template = "{% extends 'layout.jinja3.html' %}\n" + "{% block content %}" + f"{ content }" + "{% endblock %}"
         fp.write(template)
-    print("name", name)
     return jenv.get_template(name).render(site=site, content=content)
 
 

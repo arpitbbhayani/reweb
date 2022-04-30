@@ -19,10 +19,18 @@ class Site:
 def read_site():
     with open("reweb.json", "r") as fp:
         site = Site(**json.load(fp))
-    for name in os.listdir("./data"):
-        with open(os.path.join("./data", name)) as fp:
-            metadata = json.load(fp)
-            site.data[name.split(".")[0]] = metadata
+    
+    basepath = "./data"
+    for (root, _, filepaths) in os.walk(basepath):
+        for path in filepaths:
+            filepath = os.path.join(root, path)
+            with open(filepath) as fp:
+                if not filepath.endswith(".json"):
+                    continue
+                metadata = json.load(fp)
+                relative_path = os.path.relpath(filepath, basepath)
+                key = relative_path.replace("/", "_").split(".")[0]
+                site.data[key] = metadata
     return site
 
 

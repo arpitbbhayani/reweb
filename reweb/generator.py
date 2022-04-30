@@ -1,4 +1,5 @@
 import os
+import json
 import tempfile
 from hashlib import md5
 
@@ -45,9 +46,11 @@ def __generate_bundle(site):
     # shutil.make_archive(f"{site.name}-{site.version}", 'zip', "dist")
 
 
-def __generate_distpath(filepath):
+def __generate_distpath(filepath, filename=None):
     relpath = os.path.relpath(filepath, "pages")
     distpath = os.path.join("dist/", relpath.replace(".md", ".html"))
+    if filename:
+        distpath = os.path.dirname(distpath) + "/" + filename
     try:
         os.makedirs(os.path.dirname(distpath))
     except FileExistsError:
@@ -86,6 +89,29 @@ def __generate_page_html(html_filepath, site):
         fp.write(output)
 
 
+def __generate_pattern_json(pattern_filepath, site):
+    name = os.path.basename(pattern_filepath)[1:].split(".")[0]
+    with open(pattern_filepath, "r") as fp:
+        meta = json.loads(fp.read())
+
+    source = meta["source"]
+    template = meta["template"]
+    basepath_attr = meta["basepath_attr"]
+
+    with open(source, "r") as fp:
+        for item in json.loads(fp.read()):
+            kwargs = { name: item, "site": site }
+            content = render_by_name(template, **kwargs)
+            output = render(site=site, content=content)
+            
+            distpath = __generate_distpath(pattern_filepath, filename=f"{item[basepath_attr]}.html")
+
+            # create the file
+            print(distpath)
+            with open(distpath, "w") as fp:
+                fp.write(output)
+
+
 def __generate_pages(site):
     basepath = "./pages"
     for (root, _, filepaths) in os.walk(basepath):
@@ -95,6 +121,8 @@ def __generate_pages(site):
                 __generate_page_md(filepath, site)
             elif path.endswith(".html"):
                 __generate_page_html(filepath, site)
+            elif path.startswith("_") and path.endswith(".json"):
+                __generate_pattern_json(filepath, site)
             else:
                 raise Exception("unsupported page: " + path)
 
