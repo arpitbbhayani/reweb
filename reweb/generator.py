@@ -1,5 +1,6 @@
 import os
 import json
+import gzip
 import tempfile
 from hashlib import md5
 from distutils.dir_util import copy_tree
@@ -82,8 +83,9 @@ def __generate_page_html(html_filepath, site):
     output = render(site=site, content=content)
 
     # create the file
-    with open(distpath, "w") as fp:
-        fp.write(output)
+    with open(distpath, "wb") as fp:
+        # fp.write(gzip.compress(output.encode()))
+        fp.write(output.encode())
 
 
 def __generate_pattern_json(pattern_filepath, site):
