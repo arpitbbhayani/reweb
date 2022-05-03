@@ -2,6 +2,7 @@ import os
 import json
 import tempfile
 from hashlib import md5
+from distutils.dir_util import copy_tree
 
 import sass
 import frontmatter
@@ -16,9 +17,8 @@ from reweb.version import next_version
 
 def __generate_css(site):
     with tempfile.TemporaryDirectory() as tempdir:
-        tempdir = "/tmp/test"
+        tempdir = "/tmp/test3"
         resp = requests.get("https://github.com/jgthms/bulma/releases/download/0.9.3/bulma-0.9.3.zip")
-        print(tempdir)
         with open(os.path.join(tempdir, "bulma.zip"), "wb") as fp:
             fp.write(resp.content)
 
@@ -66,11 +66,8 @@ def __setup_dist():
 def __generate_page_md(md_filepath, site):
     page = frontmatter.load(md_filepath)
     content = markdown.markdown(page.content, extensions=[fenced_code.FencedCodeExtension()])
-
     distpath = __generate_distpath(md_filepath)
-
     output = render(site=site, content=content, type="md", page=page.to_dict())
-
     # create the file
     with open(distpath, "w") as fp:
         fp.write(output)
@@ -126,9 +123,15 @@ def __generate_pages(site):
             else:
                 raise Exception("unsupported page: " + path)
 
+
+def __copy_static():
+    if os.path.exists("./static"):
+        copy_tree("./static", "dist/static")
+
 def generate():
     site = read_site()
     __setup_dist()
     __generate_css(site)
-    __generate_pages(site)
     __generate_bundle(site)
+    __copy_static()
+    __generate_pages(site)

@@ -1,5 +1,6 @@
 import os
 import json
+import base64
 
 
 class Site:
@@ -25,12 +26,23 @@ def read_site():
         for path in filepaths:
             filepath = os.path.join(root, path)
             with open(filepath) as fp:
-                if not filepath.endswith(".json"):
-                    continue
-                metadata = json.load(fp)
                 relative_path = os.path.relpath(filepath, basepath)
                 key = relative_path.replace("/", "_").split(".")[0]
-                site.data[key] = metadata
+                if filepath.endswith(".json"):
+                    content = json.load(fp)
+                    site.data[key] = content
+
+    basepath = "./static"
+    for (root, _, filepaths) in os.walk(basepath):
+        for path in filepaths:
+            filepath = os.path.join(root, path)
+            with open(filepath, 'rb') as fp:
+                relative_path = os.path.relpath(filepath, basepath)
+                key = relative_path.replace("/", "_").split(".")[0]
+    
+                if filepath.endswith(".svg"):
+                    content = fp.read()
+                    site.data[key] = str(base64.b64encode(content))[2:-1]
     return site
 
 

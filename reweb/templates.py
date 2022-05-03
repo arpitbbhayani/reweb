@@ -8,7 +8,7 @@ from jinja2 import Environment, FileSystemLoader
 
 
 with tempfile.TemporaryDirectory() as tempdir:
-    tempdir = "/tmp/test1"
+    tempdir = "/tmp/test2"
     spec = importlib.util.find_spec("reweb")
     pkgdir = next(iter(spec.submodule_search_locations))  # type: ignore
     template_root = os.path.join(pkgdir, "templates")
