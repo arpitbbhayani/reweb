@@ -37,6 +37,14 @@ def __generate_css(site):
 
         with open("dist/static/style.css", "w") as fp:
             fp.write(sass.compile(filename=f'{tempdir}/custom.scss'))
+        
+        with open(os.path.join(tempdir, "minify.js"), "w") as fp:
+            fp.write(render_by_name("minify.jinja3.js"))
+
+        os.system("node " + os.path.join(tempdir, "minify.js"))
+
+        with open("dist/static/style.min.css", "r") as fp:
+            site.data["style"] = fp.read()
 
 
 def __generate_bundle(site):
@@ -133,7 +141,8 @@ def __copy_static():
 def generate():
     site = read_site()
     __setup_dist()
-    __generate_css(site)
     __generate_bundle(site)
     __copy_static()
+    __generate_pages(site)
+    __generate_css(site)
     __generate_pages(site)

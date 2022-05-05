@@ -48,4 +48,5 @@ def read_site():
 
 def store_site(site):
     with open("reweb.json", "w") as fp:
-        return fp.write(json.dumps(site.dict(), indent=4))
+        data = site.dict()
+        return fp.write(json.dumps({ k:v for k, v in data.items() if k != "data" }, indent=4))

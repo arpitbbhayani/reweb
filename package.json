@@ -1,0 +1,25 @@
+{
+  "name": "reweb",
+  "version": "1.0.0",
+  "description": "reweb ===",
+  "scripts": {
+    "build": "esbuild minify.js --platform=node --bundle --minify --outfile=reweb/templates/minify.jinja3.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/relogX/reweb.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/relogX/reweb/issues"
+  },
+  "homepage": "https://github.com/relogX/reweb#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "clean-css": "^5.3.0",
+    "esbuild": "^0.14.38",
+    "purgecss": "^4.1.3"
+  }
+}
