@@ -23,7 +23,7 @@ def init():
                 version="0.0.1",
                 baseurl=baseurl,
                 author=author,
-                keywords=keywords
+                keywords=keywords,
             )
         )
 

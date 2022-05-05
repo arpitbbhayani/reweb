@@ -4,13 +4,14 @@ import base64
 
 
 class Site:
-    def __init__(self, name, description, version, baseurl, keywords, author, **kwargs):
+    def __init__(self, name, description, version, baseurl, keywords, author, favicon="", **kwargs):
         self.name = name
         self.description = description
         self.version = version
         self.baseurl = baseurl
         self.keywords = keywords
         self.author = author
+        self.favicon = favicon
         self.data = {}
 
     def dict(self):

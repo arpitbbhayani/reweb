@@ -4,6 +4,7 @@ import gzip
 import tempfile
 from hashlib import md5
 from distutils.dir_util import copy_tree
+from distutils.file_util import copy_file
 
 import sass
 import frontmatter
@@ -137,6 +138,10 @@ def __generate_pages(site):
 def __copy_static():
     if os.path.exists("./static"):
         copy_tree("./static", "dist/static")
+    
+    if os.path.exists("./templates/robots.txt"):
+        copy_file("./templates/robots.txt", "dist/robots.txt")
+
 
 def generate():
     site = read_site()
