@@ -5,6 +5,7 @@ import tempfile
 from hashlib import md5
 from distutils.dir_util import copy_tree
 from distutils.file_util import copy_file
+from datetime import datetime
 
 import sass
 import frontmatter
@@ -16,6 +17,9 @@ from reweb.templates import render, render_by_name
 from reweb.site import read_site, store_site
 from reweb.version import next_version
 
+import xml.etree.cElementTree as ET
+
+PAGES = []
 
 def __generate_css(site):
     with tempfile.TemporaryDirectory() as tempdir:
@@ -65,7 +69,9 @@ def __generate_distpath(filepath, filename=None):
         os.makedirs(os.path.dirname(distpath))
     except FileExistsError:
         pass
-    return distpath
+
+    url = distpath.replace(".md", ".html").replace(".html", "").replace("dist/", "")
+    return distpath, url
 
 
 def __setup_dist():
@@ -76,18 +82,20 @@ def __setup_dist():
 def __generate_page_md(md_filepath, site):
     page = frontmatter.load(md_filepath)
     content = markdown.markdown(page.content, extensions=[fenced_code.FencedCodeExtension()])
-    distpath = __generate_distpath(md_filepath)
+    distpath, url = __generate_distpath(md_filepath)
     output = render(site=site, content=content, type="md", page=page.to_dict())
     # create the file
     with open(distpath, "w") as fp:
         fp.write(output)
+
+    PAGES.append(url)
 
 
 def __generate_page_html(html_filepath, site):
     with open(html_filepath, "r") as fp:
         content = fp.read()
 
-    distpath = __generate_distpath(html_filepath)
+    distpath, url = __generate_distpath(html_filepath)
 
     output = render(site=site, content=content)
 
@@ -95,6 +103,8 @@ def __generate_page_html(html_filepath, site):
     with open(distpath, "wb") as fp:
         # fp.write(gzip.compress(output.encode()))
         fp.write(output.encode())
+
+    PAGES.append(url)
 
 
 def __generate_pattern_json(pattern_filepath, site):
@@ -112,12 +122,13 @@ def __generate_pattern_json(pattern_filepath, site):
             content = render_by_name(template, **kwargs)
             output = render(site=site, content=content)
             
-            distpath = __generate_distpath(pattern_filepath, filename=f"{item[basepath_attr]}.html")
+            distpath, url = __generate_distpath(pattern_filepath, filename=f"{item[basepath_attr]}.html")
 
             # create the file
-            print(distpath)
             with open(distpath, "w") as fp:
                 fp.write(output)
+            
+            PAGES.append(url)
 
 
 def __generate_pages(site):
@@ -143,6 +154,36 @@ def __copy_static():
         copy_file("./templates/robots.txt", "dist/robots.txt")
 
 
+def __generate_sitemap(site):
+    schema_loc = ("http://www.sitemaps.org/schemas/sitemap/0.9 "
+                  "http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd")
+
+    root = ET.Element("urlset")
+    root.attrib['xmlns:xsi'] = 'http://www.w3.org/2001/XMLSchema-instance'
+    root.attrib['xsi:schemaLocation'] = schema_loc
+    root.attrib['xmlns'] = "http://www.sitemaps.org/schemas/sitemap/0.9"
+    
+    dt = datetime.now().strftime("%Y-%m-%d")  # <-- Get current date and time.
+
+    tree = ET.ElementTree(root)
+
+    doc = ET.SubElement(root, "url")
+    ET.SubElement(doc, "loc").text = site.baseurl
+    ET.SubElement(doc, "lastmod").text = dt
+    ET.SubElement(doc, "changefreq").text = 'weekly'
+    ET.SubElement(doc, "priority").text = "1.0"
+
+    for url in PAGES:
+        doc = ET.SubElement(root, "url")
+        ET.SubElement(doc, "loc").text = (f"{site.baseurl}{url}")
+        ET.SubElement(doc, "lastmod").text = dt
+        ET.SubElement(doc, "changefreq").text = 'weekly'
+        ET.SubElement(doc, "priority").text = "0.6"
+
+    tree.write("dist/sitemap.xml",
+                encoding='utf-8', xml_declaration=True)
+
+
 def generate():
     site = read_site()
     __setup_dist()
@@ -151,3 +192,4 @@ def generate():
     __generate_pages(site)
     __generate_css(site)
     __generate_pages(site)
+    __generate_sitemap(site)
