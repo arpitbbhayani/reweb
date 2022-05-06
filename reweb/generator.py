@@ -1,6 +1,7 @@
 import os
 import json
 import gzip
+import shutil
 import tempfile
 from hashlib import md5
 from distutils.dir_util import copy_tree
@@ -57,7 +58,7 @@ def __generate_bundle(site):
     store_site(site)
 
     # TODO: ZIP
-    # shutil.make_archive(f"{site.name}-{site.version}", 'zip', "dist")
+    shutil.make_archive(f"{site.name}", 'zip', "dist")
 
 
 def __generate_distpath(filepath, filename=None):
@@ -77,6 +78,8 @@ def __generate_distpath(filepath, filename=None):
 def __setup_dist():
     if not os.path.exists("dist"):
         os.mkdir("dist")
+
+    copy_tree("root", "dist")
 
 
 def __generate_page_md(md_filepath, site):
