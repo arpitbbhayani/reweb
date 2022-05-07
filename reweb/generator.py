@@ -72,6 +72,8 @@ def __generate_distpath(filepath, filename=None):
         pass
 
     url = distpath.replace(".md", ".html").replace(".html", "").replace("dist/", "")
+    if url.endswith("/index"):
+        url = url.replace("/index", "")
     return distpath, url
 
 
