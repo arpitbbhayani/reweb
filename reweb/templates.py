@@ -1,5 +1,6 @@
 import os
 import importlib
+from jinja2 import Template
 import shutil
 import tempfile
 from uuid import uuid4
@@ -21,7 +22,7 @@ with tempfile.TemporaryDirectory() as tempdir:
     )
 
 
-def render(site, content, type="html", template="blog.html", page=None):
+def render(site, content, seo=None, type="html", template="blog.html", page=None):
     name = uuid4().hex
     tpath = os.path.join(tempdir, name)
 
@@ -31,8 +32,12 @@ def render(site, content, type="html", template="blog.html", page=None):
     with open(tpath, "w") as fp:
         template = "{% extends 'layout.jinja3.html' %}\n" + "{% block content %}" + f"{ content }" + "{% endblock %}"
         fp.write(template)
-    return jenv.get_template(name).render(site=site, content=content)
+    return jenv.get_template(name).render(site=site, content=content, seo=seo or {})
 
 
 def render_by_name(name, **kwargs):
     return jenv.get_template(name).render(**kwargs)
+
+
+def render_raw(template, **kwargs):
+    return Template(template).render(**kwargs)

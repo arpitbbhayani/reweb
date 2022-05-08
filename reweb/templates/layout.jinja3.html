@@ -1,7 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    {% block seo %}{% endblock %}
+    <title>{{ seo.title }}</title>
+    <meta name="description" content="{{ seo.description }}">
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@arpit_bhayani" />
+    <meta name="twitter:title" content="{{ seo.title }}" />
+    <meta name="twitter:description" content="{{ seo.description }}" />
+    <meta name="twitter:image" content="{{ seo.img or 'https://edge.arpitbhayani.me/img/covers/general-cover.png' }}" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content="{{ seo.title }}" />
+    <meta property="og:description" content="{{ seo.description }}" />
+    <meta property="og:image" content="{{ seo.img or 'https://edge.arpitbhayani.me/img/covers/general-cover.png' }}" />
+    <meta property="og:url" content="{{ seo.url }}" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="keywords" content="{{ site.keywords|join(', ') }}">

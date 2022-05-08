@@ -14,7 +14,7 @@ import markdown
 from markdown.extensions import fenced_code
 import requests, zipfile
 
-from reweb.templates import render, render_by_name
+from reweb.templates import render, render_by_name, render_raw
 from reweb.site import read_site, store_site
 from reweb.version import next_version
 
@@ -88,7 +88,13 @@ def __generate_page_md(md_filepath, site):
     page = frontmatter.load(md_filepath)
     content = markdown.markdown(page.content, extensions=[fenced_code.FencedCodeExtension()])
     distpath, url = __generate_distpath(md_filepath)
-    output = render(site=site, content=content, type="md", page=page.to_dict())
+    meta = page.to_dict()
+    output = render(site=site, content=content, type="md", seo={
+        "title": meta["title"],
+        "description": meta["description"],
+        "img": meta["image"],
+        "url": "https://arpitbhayani.me/blogs/" + meta["id"],
+    }, page=meta)
     # create the file
     with open(distpath, "w") as fp:
         fp.write(output)
@@ -100,9 +106,14 @@ def __generate_page_html(html_filepath, site):
     with open(html_filepath, "r") as fp:
         content = fp.read()
 
+    seo = {}
+    if "===" in content:
+        seo = json.loads(content.split("===")[0])
+        content = content.split("===")[1]
+
     distpath, url = __generate_distpath(html_filepath)
 
-    output = render(site=site, content=content)
+    output = render(site=site, content=content, seo=seo)
 
     # create the file
     with open(distpath, "wb") as fp:
@@ -125,7 +136,12 @@ def __generate_pattern_json(pattern_filepath, site):
         for item in json.loads(fp.read()):
             kwargs = { name: item, "site": site }
             content = render_by_name(template, **kwargs)
-            output = render(site=site, content=content)
+            output = render(site=site, content=content, seo={
+                "title": render_raw(meta["seo"]["title"], **item),
+                "description": render_raw(meta["seo"]["description"], **item),
+                "url": render_raw(meta["seo"]["url"], **item),
+                "img": render_raw(meta["seo"]["img"], **item),
+            })
             
             distpath, url = __generate_distpath(pattern_filepath, filename=f"{item[basepath_attr]}.html")
 
@@ -192,9 +208,9 @@ def __generate_sitemap(site):
 def generate():
     site = read_site()
     __setup_dist()
-    __generate_bundle(site)
     __copy_static()
     __generate_pages(site)
     __generate_css(site)
     __generate_pages(site)
     __generate_sitemap(site)
+    __generate_bundle(site)
