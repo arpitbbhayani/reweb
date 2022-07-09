@@ -18,6 +18,7 @@
     <meta name="keywords" content="{{ site.keywords|join(', ') }}">
     <meta name="author" content="{{ site.author }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ site.favicon }}">
+    <link rel="apple-touch-icon" href="{{ site.favicon }}">
     <style>{{ site.data.style }}</style>
   </head>
   <body>
@@ -31,4 +32,14 @@
       </section>
     </div>
   </body>
+  <head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-71339255-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-71339255-1');
+    </script>
+  </head>
 </html>

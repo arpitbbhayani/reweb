@@ -131,26 +131,30 @@ def __generate_pattern_json(pattern_filepath, site):
 
     source = meta["source"]
     template = meta["template"]
-    basepath_attr = meta["basepath_attr"]
+    pagepath_template = meta["pagepath_template"]
 
     with open(source, "r") as fp:
         for item in json.loads(fp.read()):
             kwargs = { name: item, "site": site }
             content = render_by_name(template, **kwargs)
+            seo_url = render_raw(meta["seo"]["url"], **item)
             output = render(site=site, content=content, seo={
                 "title": render_raw(meta["seo"]["title"], **item),
                 "description": render_raw(meta["seo"]["description"], **item),
-                "url": render_raw(meta["seo"]["url"], **item),
+                "url": seo_url,
                 "img": render_raw(meta["seo"]["img"], **item),
             })
             
-            distpath, url = __generate_distpath(pattern_filepath, filename=f"{item[basepath_attr]}.html")
+            distpath, url = __generate_distpath(
+              pattern_filepath,
+              filename=render_raw(pagepath_template, **item)
+            )
 
             # create the file
             with open(distpath, "w") as fp:
                 fp.write(output)
             
-            PAGES.append(url)
+            PAGES.append(seo_url)
 
 
 def __generate_pages(site):
@@ -158,6 +162,8 @@ def __generate_pages(site):
     for (root, _, filepaths) in os.walk(basepath):
         for path in filepaths:
             filepath = os.path.join(root, path)
+            # if "competitive-programming-solutions" in filepath:
+            #     continue
             if path.endswith(".md"):
                 __generate_page_md(filepath, site)
             elif path.endswith(".html"):
