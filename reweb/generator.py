@@ -144,6 +144,7 @@ def __generate_pattern_json(pattern_filepath, site):
                 "url": seo_url,
                 "img": render_raw(meta["seo"]["img"], **item),
             })
+            print(seo_url)
             
             distpath, url = __generate_distpath(
               pattern_filepath,
@@ -203,7 +204,9 @@ def __generate_sitemap(site):
 
     for url in PAGES:
         doc = ET.SubElement(root, "url")
-        ET.SubElement(doc, "loc").text = (f"{site.baseurl}{url}")
+        if not url.startswith(site.baseurl):
+          url = f"{site.baseurl}{url}"
+        ET.SubElement(doc, "loc").text = url
         ET.SubElement(doc, "lastmod").text = dt
         ET.SubElement(doc, "changefreq").text = 'weekly'
         ET.SubElement(doc, "priority").text = "0.6"
